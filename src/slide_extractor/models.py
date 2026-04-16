@@ -56,7 +56,11 @@ def load_sam3(cfg: Config) -> tuple:
     from sam3.model.sam3_image_processor import Sam3Processor
 
     _image_model = build_sam3_image_model(device=cfg.device)
-    _processor = Sam3Processor(_image_model)
+    _processor = Sam3Processor(
+        _image_model,
+        device=cfg.device,
+        confidence_threshold=cfg.detection_confidence,
+    )
 
     console.print("[green]SAM 3.1 loaded[/green]")
     return _image_model, _processor
@@ -84,19 +88,13 @@ def detect_slide(
     pil_image = Image.fromarray(image[:, :, ::-1])
 
     inference_state = processor.set_image(pil_image)
-    output = processor.set_text_prompt(
-        state=inference_state,
-        prompt=prompt,
-    )
+    output = processor.set_text_prompt(prompt, inference_state)
 
-    masks = output["masks"]  # (N, H, W) tensor or array
+    masks = output["masks"]  # (N, 1, H, W) bool tensor
     scores = output["scores"]  # (N,) confidence scores
-    boxes = output["boxes"]  # (N, 4) bounding boxes
+    boxes = output["boxes"]  # (N, 4) bounding boxes [x0, y0, x1, y1]
 
-    if len(scores) == 0:
-        return None
-
-    # Convert to numpy if tensors
+    # Convert to numpy
     if isinstance(scores, torch.Tensor):
         scores = scores.cpu().numpy()
     if isinstance(masks, torch.Tensor):
@@ -104,13 +102,21 @@ def detect_slide(
     if isinstance(boxes, torch.Tensor):
         boxes = boxes.cpu().numpy()
 
+    if len(scores) == 0:
+        return None
+
     # Find best detection above threshold
     best_idx = int(np.argmax(scores))
     if scores[best_idx] < confidence_threshold:
         return None
 
+    # masks shape: (N, 1, H, W) -> squeeze to (H, W)
+    mask = masks[best_idx]
+    if mask.ndim == 3:
+        mask = mask.squeeze(0)
+
     return {
-        "mask": masks[best_idx].astype(bool),
+        "mask": mask.astype(bool),
         "score": float(scores[best_idx]),
         "box": boxes[best_idx].tolist(),
     }

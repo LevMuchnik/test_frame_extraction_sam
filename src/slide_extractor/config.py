@@ -50,19 +50,20 @@ class Config:
         else:
             load_dotenv()
 
+        # Use string defaults for fields that use default_factory
         return cls(
-            sam3_model=os.getenv("SAM3_MODEL", cls.sam3_model),
-            model_cache_dir=Path(os.getenv("MODEL_CACHE_DIR", str(cls.model_cache_dir))),
+            sam3_model=os.getenv("SAM3_MODEL", "sam3.1_hiera_large"),
+            model_cache_dir=Path(os.getenv("MODEL_CACHE_DIR", "./models")),
             hf_token=os.getenv("HF_TOKEN", ""),
-            positive_prompt=os.getenv("POSITIVE_PROMPT", cls.positive_prompt),
-            detection_confidence=float(os.getenv("DETECTION_CONFIDENCE", cls.detection_confidence)),
-            deskew_width=int(os.getenv("DESKEW_WIDTH", cls.deskew_width)),
-            deskew_height=int(os.getenv("DESKEW_HEIGHT", cls.deskew_height)),
-            contour_epsilon=float(os.getenv("CONTOUR_EPSILON", cls.contour_epsilon)),
-            ssim_threshold=float(os.getenv("SSIM_THRESHOLD", cls.ssim_threshold)),
-            output_dir=Path(os.getenv("OUTPUT_DIR", str(cls.output_dir))),
+            positive_prompt=os.getenv("POSITIVE_PROMPT", "projector screen . presentation slide"),
+            detection_confidence=float(os.getenv("DETECTION_CONFIDENCE", "0.75")),
+            deskew_width=int(os.getenv("DESKEW_WIDTH", "1920")),
+            deskew_height=int(os.getenv("DESKEW_HEIGHT", "1080")),
+            contour_epsilon=float(os.getenv("CONTOUR_EPSILON", "0.02")),
+            ssim_threshold=float(os.getenv("SSIM_THRESHOLD", "0.85")),
+            output_dir=Path(os.getenv("OUTPUT_DIR", "./outputs")),
             save_debug_frames=_bool(os.getenv("SAVE_DEBUG_FRAMES", "false")),
-            device=os.getenv("DEVICE", cls.device),
+            device=os.getenv("DEVICE", "cuda"),
         )
 
     def video_output_dir(self, video_path: Path) -> Path:

@@ -28,7 +28,7 @@ cp .env.example .env
 # Edit .env with your HuggingFace token
 
 # Login to HuggingFace (for model weights)
-uv run huggingface-cli login
+uv run hf auth login
 
 # Download SAM 3.1 model weights
 uv run slide-extractor download-models
