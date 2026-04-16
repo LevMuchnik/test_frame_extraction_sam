@@ -11,7 +11,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
 
 
 @dataclass
@@ -61,13 +61,13 @@ class PipelineMetrics:
         """Context manager that times a phase and collects its metrics."""
         pm = PhaseMetrics(name=name, start_time=time.time())
         self.phases.append(pm)
-        console.print(f"\n[bold cyan]▶ Phase: {name}[/bold cyan]")
+        console.print(f"\n[bold cyan]>> Phase: {name}[/bold cyan]")
         try:
             yield pm
         finally:
             pm.end_time = time.time()
             console.print(
-                f"[green]✓ {name}[/green] completed in {pm.elapsed:.1f}s"
+                f"[green]OK {name}[/green] completed in {pm.elapsed:.1f}s"
             )
 
     def to_dict(self) -> dict:

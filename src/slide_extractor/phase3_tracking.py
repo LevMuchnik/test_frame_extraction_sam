@@ -13,7 +13,7 @@ from skimage.metrics import structural_similarity as ssim
 from .config import Config
 from .metrics import PhaseMetrics
 
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
 
 
 def run_phase3(

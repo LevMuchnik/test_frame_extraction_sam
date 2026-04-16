@@ -14,7 +14,7 @@ from rich.console import Console
 from .config import Config
 from .metrics import PhaseMetrics
 
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
 
 
 def _compute_sharpness(image: np.ndarray) -> float:

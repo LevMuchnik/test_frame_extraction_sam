@@ -21,8 +21,8 @@ class Config:
     hf_token: str = ""
 
     # Detection
-    positive_prompt: str = "projector screen . presentation slide"
-    detection_confidence: float = 0.75
+    positive_prompt: str = "slide . presentation"
+    detection_confidence: float = 0.3
 
     # Geometry
     deskew_width: int = 1920
@@ -55,8 +55,8 @@ class Config:
             sam3_model=os.getenv("SAM3_MODEL", "sam3.1_hiera_large"),
             model_cache_dir=Path(os.getenv("MODEL_CACHE_DIR", "./models")),
             hf_token=os.getenv("HF_TOKEN", ""),
-            positive_prompt=os.getenv("POSITIVE_PROMPT", "projector screen . presentation slide"),
-            detection_confidence=float(os.getenv("DETECTION_CONFIDENCE", "0.75")),
+            positive_prompt=os.getenv("POSITIVE_PROMPT", "slide . presentation"),
+            detection_confidence=float(os.getenv("DETECTION_CONFIDENCE", "0.3")),
             deskew_width=int(os.getenv("DESKEW_WIDTH", "1920")),
             deskew_height=int(os.getenv("DESKEW_HEIGHT", "1080")),
             contour_epsilon=float(os.getenv("CONTOUR_EPSILON", "0.02")),

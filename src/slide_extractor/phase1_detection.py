@@ -8,13 +8,13 @@ from pathlib import Path
 import cv2
 import numpy as np
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
+from rich.progress import Progress, TimeElapsedColumn
 
 from .config import Config
 from .metrics import PhaseMetrics
 from .models import detect_slide, load_sam3
 
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
 
 
 def _mask_to_rle(mask: np.ndarray) -> dict:
@@ -75,7 +75,6 @@ def run_phase1(
     sample_idx = 0
 
     with Progress(
-        SpinnerColumn(),
         *Progress.get_default_columns(),
         TimeElapsedColumn(),
         console=console,

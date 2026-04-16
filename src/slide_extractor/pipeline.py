@@ -14,7 +14,7 @@ from .phase2_geometry import run_phase2
 from .phase3_tracking import run_phase3
 from .phase4_output import run_phase4
 
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
 
 PHASES = {"detect", "geometry", "track", "output"}
 

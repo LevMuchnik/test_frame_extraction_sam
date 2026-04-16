@@ -11,7 +11,7 @@ from rich.console import Console
 
 from .config import Config
 
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
 
 # Lazy-loaded model references
 _image_model = None
@@ -59,7 +59,7 @@ def load_sam3(cfg: Config) -> tuple:
     _processor = Sam3Processor(
         _image_model,
         device=cfg.device,
-        confidence_threshold=cfg.detection_confidence,
+        confidence_threshold=0.05,  # Low threshold; we filter ourselves in detect_slide
     )
 
     console.print("[green]SAM 3.1 loaded[/green]")
@@ -87,20 +87,21 @@ def detect_slide(
     # Convert BGR to RGB PIL image
     pil_image = Image.fromarray(image[:, :, ::-1])
 
-    inference_state = processor.set_image(pil_image)
-    output = processor.set_text_prompt(prompt, inference_state)
+    with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+        inference_state = processor.set_image(pil_image)
+        output = processor.set_text_prompt(prompt, inference_state)
 
     masks = output["masks"]  # (N, 1, H, W) bool tensor
     scores = output["scores"]  # (N,) confidence scores
     boxes = output["boxes"]  # (N, 4) bounding boxes [x0, y0, x1, y1]
 
-    # Convert to numpy
+    # Convert to numpy (cast from bfloat16 to float32 first)
     if isinstance(scores, torch.Tensor):
-        scores = scores.cpu().numpy()
+        scores = scores.float().cpu().numpy()
     if isinstance(masks, torch.Tensor):
-        masks = masks.cpu().numpy()
+        masks = masks.float().cpu().numpy()
     if isinstance(boxes, torch.Tensor):
-        boxes = boxes.cpu().numpy()
+        boxes = boxes.float().cpu().numpy()
 
     if len(scores) == 0:
         return None

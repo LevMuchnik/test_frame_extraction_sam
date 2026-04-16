@@ -2,6 +2,13 @@
 
 from __future__ import annotations
 
+import os
+import sys
+
+# Force UTF-8 mode on Windows to avoid cp1252 encoding errors with Rich
+if sys.platform == "win32":
+    os.environ.setdefault("PYTHONUTF8", "1")
+
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -14,7 +21,7 @@ app = typer.Typer(
     name="slide-extractor",
     help="Lecture slide extraction pipeline using Meta SAM 3.1",
 )
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
 
 
 @app.command()
@@ -81,7 +88,7 @@ def process(
 
     for i, vp in enumerate(videos, 1):
         console.print(
-            f"[bold yellow]━━━ Video {i}/{len(videos)}: {vp.name} ━━━[/bold yellow]"
+            f"[bold yellow]--- Video {i}/{len(videos)}: {vp.name} ---[/bold yellow]"
         )
         run_pipeline(vp, cfg, phase_filter=phase)
 

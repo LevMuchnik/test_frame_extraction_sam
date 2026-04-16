@@ -8,12 +8,12 @@ from pathlib import Path
 import cv2
 import numpy as np
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
+from rich.progress import Progress, TimeElapsedColumn
 
 from .config import Config
 from .metrics import PhaseMetrics
 
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
 
 
 def _rle_to_mask(rle: dict) -> np.ndarray:
@@ -123,7 +123,6 @@ def run_phase2(
     corner_counts: dict[int, int] = {}
 
     with Progress(
-        SpinnerColumn(),
         *Progress.get_default_columns(),
         TimeElapsedColumn(),
         console=console,
